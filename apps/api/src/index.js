@@ -1,30 +1,37 @@
-// apps/api/src/index.js
-
-// 1. IMPORTAR AS FERRAMENTAS
 import express from 'express';
 import cors from 'cors';
-import pkg from '@prisma/client'
-const { PrismaClient } = pkg    // O Cliente que acabamos de gerar!
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import authMiddleware from './middlewares/auth.js';
 
-// 2. INICIAR AS FERRAMENTAS
+
 const app = express();
 app.use(cors());
-app.use(express.json()); 
+app.use(express.json());
 
-const prisma = new PrismaClient(); // Nosso tradutor pronto para trabalhar!
+const prisma = new PrismaClient();
 
-// 3. DEFINIR A ROTA DE REGISTRO
+
+// rotas públicas 
 app.post('/register', async (req, res) => {
   try {
-    // a. Pega os dados do corpo da requisição
+    
     const { name, email, password } = req.body;
 
-    // b. Criptografa a senha (NUNCA SALVE SENHAS EM TEXTO PURO)
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Nome, e-mail e senha são obrigatórios.' });
+    }
+    if (typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres.' });
+    }
+
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // c. Usa o Prisma Client para criar um novo usuário no banco
+    // d. Usa o Prisma Client para criar um novo usuário no banco
     const user = await prisma.user.create({
       data: {
         name,
@@ -33,50 +40,86 @@ app.post('/register', async (req, res) => {
       },
     });
 
-    // d. Envia uma resposta de sucesso
+    // e. Envia uma resposta de sucesso
     res.status(201).json({ message: 'Usuário criado com sucesso!', userId: user.id });
   } catch (error) {
-    // Se o prisma.user.create falhar (ex: email duplicado), ele vai gerar um erro
+    // Se o prisma.user.create falhar ele vai gerar um erro
     res.status(400).json({ error: 'Não foi possível criar o usuário. O e-mail pode já estar em uso.' });
   }
 });
+
 
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // a. Busca o usuário no banco de dados pelo email
+    
+    if (!email || !password) {
+        return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
+    }
+
+   
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
-    // b. Se o usuário não existe, retorna um erro
+   
     if (!user) {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
 
-    // c. Compara a senha enviada com a senha criptografada no banco
+    // Compara a senha enviada com a senha criptografada no banco
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Senha inválida.' });
     }
 
-    // d. Se tudo estiver certo, gera um "crachá de autorização" (Token JWT)
+    // Gera um Token JWT
     const token = jwt.sign(
-      { userId: user.id, email: user.email }, // Informações que vão dentro do crachá
-      process.env.JWT_SECRET, // A chave secreta para assinar o crachá
-      { expiresIn: '30d' } // Validade do crachá (1 dia)
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET, 
+      { expiresIn: '30d' }
     );
 
-    // e. Envia o crachá (token) para o cliente
+    // Envia o token para o cliente
     res.json({ message: 'Login bem-sucedido!', token });
   } catch (error) {
     res.status(500).json({ error: 'Ocorreu um erro interno.' });
   }
 });
 
-// 4. INICIAR O SERVIDOR
+
+// rotas privadas
+
+app.post('/transactions', authMiddleware, async (req, res) => {
+  try {
+    // Graças ao middleware, temos o ID do usuário logado em `req.userId`
+    const userId = req.userId;
+    const { type, title, amount, date } = req.body;
+
+    // Validação simples dos dados da transação
+    if (!type || !title || amount === undefined || !date) {
+        return res.status(400).json({ error: 'Todos os campos (type, title, amount, date) são obrigatórios.' });
+    }
+
+    const transaction = await prisma.transaction.create({
+        data: {
+            userId, 
+            type,
+            title,
+            amount,
+            date: new Date(date), 
+        }
+    });
+
+    res.status(201).json(transaction);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível criar a transação.' });
+  }
+});
+
 const port = process.env.PORT || 3333;
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${port}`);
