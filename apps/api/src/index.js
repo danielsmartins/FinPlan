@@ -92,9 +92,10 @@ app.post('/login', async (req, res) => {
 
 // rotas privadas
 
+// CREATE - Criar uma nova transação
 app.post('/transactions', authMiddleware, async (req, res) => {
   try {
-    // Graças ao middleware, temos o ID do usuário logado em `req.userId`
+    
     const userId = req.userId;
     const { type, title, amount, date } = req.body;
 
@@ -120,6 +121,98 @@ app.post('/transactions', authMiddleware, async (req, res) => {
   }
 });
 
+// READ - Buscar todas as transações do usuário autenticado
+app.get('/transactions', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        userId: userId,
+      },
+      orderBy: {
+        date: 'desc', // Ordena pela data, da mais nova para a mais antiga
+      },
+    });
+
+    res.status(200).json(transactions);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível buscar as transações.' });
+  }
+});
+
+// UPDATE - Atualizar uma transação existente
+app.put('/transactions/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params; // Pega o ID da transação pela URL
+    const userId = req.userId; // Pega o ID do usuário pelo token
+    const { type, title, amount, date } = req.body; // Pega os novos dados
+
+    
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ error: 'Transação não encontrada.' });
+    }
+
+    if (transaction.userId !== userId) {
+      
+      return res.status(403).json({ error: 'Acesso negado.' });
+    }
+
+   
+    const updatedTransaction = await prisma.transaction.update({
+      where: { id },
+      data: {
+        type,
+        title,
+        amount,
+        date: new Date(date),
+      },
+    });
+
+    res.status(200).json(updatedTransaction);
+
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível atualizar a transação.' });
+  }
+});
+
+
+// DELETE - Deletar uma transação
+app.delete('/transactions/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ error: 'Transação não encontrada.' });
+    }
+
+    if (transaction.userId !== userId) {
+      return res.status(403).json({ error: 'Acesso negado.' });
+    }
+
+    
+    await prisma.transaction.delete({
+      where: { id },
+    });
+
+    
+    res.status(204).send(); 
+
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível deletar a transação.' });
+  }
+});
 const port = process.env.PORT || 3333;
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${port}`);
