@@ -1,7 +1,5 @@
-// apps/web/src/components/CategoryManager.jsx
-
 import React, { useState } from 'react';
-import api from '../services/api';
+import { createCategory, deleteCategory } from '../services/category.service'; // ATUALIZADO
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 function CategoryManager({ categories, onClose, onSuccess }) {
@@ -18,9 +16,10 @@ function CategoryManager({ categories, onClose, onSuccess }) {
     setLoading(true);
     setError('');
     try {
-      await api.post('/categories', { name: newCategoryName });
-      setNewCategoryName(''); // Limpa o input
-      onSuccess(); // Avisa o Dashboard para recarregar os dados
+      // ATUALIZADO: Usa a função do serviço
+      await createCategory({ name: newCategoryName });
+      setNewCategoryName('');
+      onSuccess();
     } catch (err) {
       setError('Erro ao adicionar categoria.');
       console.error(err);
@@ -32,8 +31,9 @@ function CategoryManager({ categories, onClose, onSuccess }) {
   const handleDeleteCategory = async (id) => {
     if (window.confirm('Tem certeza? Deletar uma categoria não afeta transações existentes, elas apenas ficarão "Sem Categoria".')) {
       try {
-        await api.delete(`/categories/${id}`);
-        onSuccess(); // Recarrega os dados
+        // ATUALIZADO: Usa a função do serviço
+        await deleteCategory(id);
+        onSuccess(); 
       } catch (err) {
         alert('Não foi possível deletar a categoria.');
         console.error(err);
@@ -49,7 +49,6 @@ function CategoryManager({ categories, onClose, onSuccess }) {
         </button>
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Gerenciar Categorias</h2>
         
-        {/* Formulário para adicionar nova categoria */}
         <form onSubmit={handleAddCategory} className="flex gap-2 mb-6">
           <input
             type="text"
@@ -64,7 +63,6 @@ function CategoryManager({ categories, onClose, onSuccess }) {
         </form>
         {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
 
-        {/* Lista de categorias existentes */}
         <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
           {categories.length > 0 ? (
             categories.map(cat => (

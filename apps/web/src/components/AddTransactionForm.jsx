@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { createTransaction, updateTransaction } from '../services/transaction.service'; // ATUALIZADO
 import clsx from 'clsx';
 
 function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories }) {
@@ -46,10 +46,11 @@ function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories
     };
 
     try {
+  
       if (isEditMode) {
-        await api.put(`/transactions/${transactionToEdit.id}`, transactionData);
+        await updateTransaction(transactionToEdit.id, transactionData);
       } else {
-        await api.post('/transactions', transactionData);
+        await createTransaction(transactionData);
       }
       onSuccess();
     } catch (err) {
@@ -79,9 +80,9 @@ function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories
           </div>
           
           <div>
-             <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
-             <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
-           </div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700">Título</label>
+              <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
+            </div>
           
           {type === 'EXPENSE' && (
             <div>
@@ -102,15 +103,15 @@ function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories
             </div>
           )}
 
-           <div>
-             <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Valor (R$)</label>
-             <input id="amount" type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
-           </div>
+            <div>
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Valor (R$)</label>
+              <input id="amount" type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
+            </div>
 
-           <div>
-             <label htmlFor="date" className="block text-sm font-medium text-gray-700">Data</label>
-             <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
-           </div>
+            <div>
+              <label htmlFor="date" className="block text-sm font-medium text-gray-700">Data</label>
+              <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
+            </div>
           
           {error && <p className="text-sm text-red-600">{error}</p>}
           

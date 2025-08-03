@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { getDashboardData } from '../services/dashboard.service'; // ATUALIZADO
+import { deleteTransaction } from '../services/transaction.service'; // ATUALIZADO
 
 // Importando os componentes modulares
 import CategoryManager from './CategoryManager'; 
@@ -18,20 +19,16 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
-  // A função fetchTransactions, agora busca transações e categorias
-  const fetchTransactions = useCallback(async () => {
+  // ATUALIZADO: A função agora usa o serviço do dashboard
+  const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Usamos Promise.all para buscar tudo em paralelo, é mais eficiente
-      const [transactionsResponse, categoriesResponse] = await Promise.all([
-        api.get('/transactions'),
-        api.get('/categories')
-      ]);
-      setTransactions(transactionsResponse.data);
-      setCategories(categoriesResponse.data);
+      const { transactions, categories } = await getDashboardData();
+      setTransactions(transactions);
+      setCategories(categories);
     } catch (err) {
       console.error("Erro ao buscar dados do dashboard:", err);
       setError("Não foi possível carregar os dados.");
@@ -40,12 +37,10 @@ function Dashboard() {
     }
   }, []);
 
-  // O useEffect chama a função como antes
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
-  // A lógica para calcular os totais do mês
   const monthlyStats = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -63,7 +58,6 @@ function Dashboard() {
     return { totalIncome, totalExpense, balance };
   }, [transactions]);
 
-  // A lógica para agrupar os dados para o gráfico
   const expenseByCategory = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -75,7 +69,6 @@ function Dashboard() {
     });
 
     const dataGrouped = monthlyExpenses.reduce((acc, transaction) => {
-      // Usa o nome da categoria vindo da relação, se não, "Outros"
       const category = transaction.category?.name || 'Sem Categoria';
       if (!acc[category]) { acc[category] = 0; }
       acc[category] += transaction.amount;
@@ -88,7 +81,8 @@ function Dashboard() {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja deletar esta transação?')) {
       try {
-        await api.delete(`/transactions/${id}`);
+        // ATUALIZADO: Usa o serviço de transação para deletar
+        await deleteTransaction(id);
         setTransactions(current => current.filter(t => t.id !== id));
       } catch (err) {
         console.error("Erro ao deletar transação:", err);
@@ -99,13 +93,13 @@ function Dashboard() {
 
   const handleCategoriesUpdated = () => { 
     setIsCategoryModalOpen(false);
-    fetchTransactions(); 
+    fetchDashboardData(); 
   }
 
   const handleTransactionSaved = () => {
     setIsAddModalOpen(false);
     setEditingTransaction(null);
-    fetchTransactions();
+    fetchDashboardData();
   };
 
   const handleCloseForm = () => {
@@ -117,7 +111,6 @@ function Dashboard() {
     localStorage.removeItem('authToken');
     navigate('/login');
   };
-
 
   if (isLoading) {
     return <div className="p-8 text-center text-gray-500">Carregando dados...</div>;
@@ -147,14 +140,16 @@ function Dashboard() {
           <div className="lg:col-span-1">
             <TransactionList
               transactions={transactions}
-              onEdit={setEditingTransaction}
+              onEdit={(transaction) => {
+                setEditingTransaction(transaction);
+                setIsAddModalOpen(true);
+              }}
               onDelete={handleDelete}
             />
           </div>
         </div>
       </div>
 
-      {/* Renderização condicional dos dois modais */}
       {(isAddModalOpen || editingTransaction) && (
         <AddTransactionForm
           onCancel={handleCloseForm}
@@ -163,7 +158,6 @@ function Dashboard() {
           categories={categories}
         />
       )}
-
 
       {isCategoryModalOpen && (
         <CategoryManager
