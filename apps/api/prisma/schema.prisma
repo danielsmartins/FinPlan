@@ -18,15 +18,14 @@ model User {
   categories   Category[]
   investments  Investment[]
   budgets      Budget[]
-  creditCards  CreditCard[] // Adicionado
+  creditCards  CreditCard[]
 }
 
-// ---> NOVO MODELO PARA CARTÃO DE CRÉDITO <---
 model CreditCard {
   id          String @id @default(uuid())
-  name        String // Ex: "Nubank", "Inter"
-  closingDay  Int    // Dia do fechamento da fatura (1-31)
-  dueDay      Int    // Dia do vencimento da fatura (1-31)
+  name        String
+  closingDay  Int
+  dueDay      Int
   
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -49,20 +48,22 @@ model Category {
 model Transaction {
   id         String   @id @default(uuid())
   userId     String
-  type       String   // "INCOME" ou "EXPENSE"
+  type       String
   title      String
   amount     Float
   date       DateTime
   createdAt  DateTime @default(now())
-  status     String   @default("PAID")
+  status     String   @default("PAID") // PAID | PENDING
+
+  //RECORRÊNCIA 
+  isRecurring    Boolean @default(false)
+  recurrenceType String? // Ex: 'MONTHLY', 'YEARLY'
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
-  // ---> CAMPO NOVO ADICIONADO <---
-  // Para vincular uma despesa a um cartão de crédito
   creditCardId String?
   creditCard   CreditCard? @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
 }

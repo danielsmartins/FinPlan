@@ -6,22 +6,21 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
-import BudgetPage from './components/BudgetPage'; // Nova página
-import MainLayout from './components/MainLayout'; // Novo layout com Navbar
+import BudgetPage from './components/BudgetPage';
+import LancamentosPage from './components/LancamentosPage'; // Nova página
+import MainLayout from './components/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    // O <Router> foi removido daqui, pois ele deve envolver o <App /> no seu arquivo main.jsx
+    // O <Router> é removido daqui e fica no main.jsx
     <Routes>
       {/* --- Rotas Públicas --- */}
-      {/* A sua página Home continua sendo a rota principal */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
       {/* --- Grupo de Rotas Protegidas --- */}
-      {/* Todas as rotas aqui dentro serão protegidas e usarão o MainLayout com a Navbar */}
       <Route
         element={
           <ProtectedRoute>
@@ -29,10 +28,9 @@ function App() {
           </ProtectedRoute>
         }
       >
-        {/* As páginas filhas serão renderizadas dentro do <Outlet /> do MainLayout */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/budget" element={<BudgetPage />} />
-        {/* Adicione futuras páginas protegidas aqui */}
+        <Route path="/lancamentos" element={<LancamentosPage />} /> {/* ROTA ADICIONADA */}
       </Route>
     </Routes>
   );

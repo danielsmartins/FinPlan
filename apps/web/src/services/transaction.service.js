@@ -1,5 +1,16 @@
 import api from './api';
 
+export const getTransactions = async () => {
+    try {
+      const response = await api.get('/transactions');
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar transações:", error.response?.data || error.message);
+      throw error;
+    }
+};
+
+
 export const createTransaction = async (transactionData) => {
   try {
     const response = await api.post('/transactions', transactionData);

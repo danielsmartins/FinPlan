@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { getCategories, createCategory, deleteCategory } from '../services/category.service';
 import { getBudgets, upsertBudget } from '../services/budget.service';
