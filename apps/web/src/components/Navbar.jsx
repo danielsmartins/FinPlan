@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { PowerIcon } from '@heroicons/react/24/solid';
 import ConfirmModal from './ConfirmModal';
 
 function Navbar() {
