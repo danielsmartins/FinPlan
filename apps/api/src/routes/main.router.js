@@ -1,13 +1,23 @@
 import { Router } from 'express';
-import authRouter from './auth.routes.js';
-import transactionRouter from './transaction.routes.js';
-import categoryRouter from './category.routes.js';
+import authRoutes from './auth.routes.js';
+import categoryRoutes from './category.routes.js';
+import transactionRoutes from './transaction.routes.js';
+import investmentRoutes from './investment.routes.js';
+import budgetRoutes from './budget.routes.js';       
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 
-const mainRouter = Router();
+const router = Router();
 
-// Agrupa todas as rotas sob seus prefixos designados
-mainRouter.use('/auth', authRouter);
-mainRouter.use('/transactions', transactionRouter);
-mainRouter.use('/categories', categoryRouter);
+// Rotas públicas (não precisam de autenticação)
+router.use('/auth', authRoutes);
 
-export default mainRouter;
+// Middleware de autenticação: todas as rotas abaixo serão protegidas
+router.use(authMiddleware);
+
+// Rotas privadas 
+router.use('/categories', categoryRoutes);
+router.use('/transactions', transactionRoutes);
+router.use('/investments', investmentRoutes); 
+router.use('/budgets', budgetRoutes);       
+
+export default router;
