@@ -3,70 +3,63 @@ import prisma from '../database/prisma.js';
 
 const router = Router();
 
-// Rota para LER todos os investimentos do usuário
+// Rota para LER os orçamentos de um mês/ano específico
 router.get('/', async (req, res) => {
+  const { month, year } = req.query;
+  if (!month || !year) {
+    return res.status(400).json({ error: 'Mês e ano são obrigatórios.' });
+  }
+
   try {
-    const investments = await prisma.investment.findMany({
-      where: { userId: req.user.id },
-      orderBy: { description: 'asc' },
+    const budgets = await prisma.budget.findMany({
+      where: {
+        userId: req.user.id,
+        month: parseInt(month),
+        year: parseInt(year),
+      },
+      include: { category: true },
     });
-    res.json(investments);
+    res.json(budgets);
   } catch (error) {
-    res.status(500).json({ error: 'Não foi possível buscar os investimentos.' });
+    res.status(500).json({ error: 'Não foi possível buscar os orçamentos.' });
   }
 });
 
-// Rota para CRIAR um novo investimento
+// Rota para CRIAR ou ATUALIZAR um orçamento (Upsert)
 router.post('/', async (req, res) => {
-  const { description, value } = req.body;
-  if (!description || value == null) {
-    return res.status(400).json({ error: 'Descrição e valor são obrigatórios.' });
+  const { categoryId, amount, month, year } = req.body;
+  
+  // Validação mais robusta no backend
+  if (!categoryId || !month || !year) {
+    return res.status(400).json({ error: 'ID da categoria, mês e ano são obrigatórios.' });
   }
 
+  // Trata o valor do amount: se for nulo ou indefinido, considera como 0.
+  const finalAmount = (amount == null || isNaN(parseFloat(amount))) ? 0 : parseFloat(amount);
+
   try {
-    const newInvestment = await prisma.investment.create({
-      data: {
+    const budget = await prisma.budget.upsert({
+      where: {
+        userId_categoryId_month_year: {
+          userId: req.user.id,
+          categoryId,
+          month: parseInt(month),
+          year: parseInt(year),
+        },
+      },
+      update: { amount: finalAmount },
+      create: {
         userId: req.user.id,
-        description,
-        value: parseFloat(value),
+        categoryId,
+        amount: finalAmount,
+        month: parseInt(month),
+        year: parseInt(year),
       },
     });
-    res.status(201).json(newInvestment);
+    res.status(201).json(budget);
   } catch (error) {
-    res.status(500).json({ error: 'Não foi possível criar o investimento.' });
-  }
-});
-
-// Rota para ATUALIZAR um investimento
-router.put('/:id', async (req, res) => {
-    const { id } = req.params;
-    const { description, value } = req.body;
-  
-    try {
-      const updatedInvestment = await prisma.investment.update({
-        where: { id: id, userId: req.user.id }, // Garante que o usuário só pode editar o seu
-        data: {
-          description,
-          value: parseFloat(value),
-        },
-      });
-      res.json(updatedInvestment);
-    } catch (error) {
-      res.status(404).json({ error: 'Investimento não encontrado ou não pertence ao usuário.' });
-    }
-  });
-
-// Rota para DELETAR um investimento
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    await prisma.investment.delete({
-      where: { id: id, userId: req.user.id },
-    });
-    res.status(204).send(); // Sem conteúdo
-  } catch (error) {
-    res.status(404).json({ error: 'Investimento não encontrado ou não pertence ao usuário.' });
+    console.error(error);
+    res.status(500).json({ error: 'Não foi possível salvar o orçamento.' });
   }
 });
 

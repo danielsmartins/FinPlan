@@ -1,38 +1,40 @@
-// Em apps/web/src/App.jsx
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 
-import { Routes, Route, Link } from 'react-router-dom';
+// Importando as páginas e componentes de layout
 import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import BudgetPage from './components/BudgetPage'; // Nova página
+import MainLayout from './components/MainLayout'; // Novo layout com Navbar
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <div>
-      <nav className="absolute top-0 left-0 w-full p-4 bg-transparent z-10">
-        <Link to="/" className="text-xl font-bold text-blue-600 hover:text-blue-800">
-          FinPlan
-        </Link>
-      </nav>
+    // O <Router> foi removido daqui, pois ele deve envolver o <App /> no seu arquivo main.jsx
+    <Routes>
+      {/* --- Rotas Públicas --- */}
+      {/* A sua página Home continua sendo a rota principal */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-      <main className="pt-20"> 
-        <Routes>
-          {/* ... suas rotas continuam as mesmas ... */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </main>
-    </div>
+      {/* --- Grupo de Rotas Protegidas --- */}
+      {/* Todas as rotas aqui dentro serão protegidas e usarão o MainLayout com a Navbar */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        {/* As páginas filhas serão renderizadas dentro do <Outlet /> do MainLayout */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/budget" element={<BudgetPage />} />
+        {/* Adicione futuras páginas protegidas aqui */}
+      </Route>
+    </Routes>
   );
 }
 

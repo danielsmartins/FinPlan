@@ -1,83 +1,99 @@
 import { Router } from 'express';
 import prisma from '../database/prisma.js';
-import { authMiddleware } from '../middlewares/auth.middleware.js'; // Ajuste o caminho se necessário
 
-const transactionRouter = Router();
+const router = Router();
 
-// Aplica o middleware de autenticação a todas as rotas de transação
-transactionRouter.use(authMiddleware);
+// Função auxiliar para ajustar a data para o fuso horário correto
+// Isso neutraliza a conversão automática que faz a data "voltar" um dia.
+const adjustDateForTimezone = (dateString) => {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  const userTimezoneOffset = date.getTimezoneOffset() * 60000; // offset em milissegundos
+  return new Date(date.getTime() + userTimezoneOffset);
+};
 
-// CREATE: POST /api/transactions
-transactionRouter.post('/', async (req, res) => {
-  try {
-    const { type, title, amount, date, categoryId } = req.body;
-    if (!type || !title || amount === undefined || !date) {
-      return res.status(400).json({ error: 'Campos type, title, amount e date são obrigatórios.' });
+// Rota para LER todas as transações do usuário
+router.get('/', async (req, res) => {
+    try {
+      const transactions = await prisma.transaction.findMany({
+        where: { userId: req.user.id },
+        include: {
+            category: true, // Inclui dados da categoria relacionada
+        },
+        orderBy: {
+          date: 'desc',
+        },
+      });
+      res.json(transactions);
+    } catch (error) {
+      res.status(500).json({ error: 'Não foi possível buscar as transações.' });
     }
-    const transaction = await prisma.transaction.create({
+});
+
+// Rota para CRIAR uma nova transação
+router.post('/', async (req, res) => {
+  const { title, amount, date, type, categoryId, creditCardId, status } = req.body;
+
+  if (!title || amount == null || !date || !type) {
+    return res.status(400).json({ error: 'Título, valor, data e tipo são obrigatórios.' });
+  }
+
+  try {
+    const newTransaction = await prisma.transaction.create({
       data: {
         userId: req.user.id,
-        type, title, amount,
-        date: new Date(date),
+        title,
+        amount: parseFloat(amount),
+        date: adjustDateForTimezone(date), // <<< CORREÇÃO APLICADA AQUI
+        type,
+        status,
         categoryId,
-      }
+        creditCardId,
+      },
     });
-    res.status(201).json(transaction);
+    res.status(201).json(newTransaction);
   } catch (error) {
+    console.error("Erro ao criar transação:", error);
     res.status(500).json({ error: 'Não foi possível criar a transação.' });
   }
 });
 
-// READ: GET /api/transactions
-transactionRouter.get('/', async (req, res) => {
-  try {
-    const transactions = await prisma.transaction.findMany({
-      where: { userId: req.user.id },
-      orderBy: { date: 'desc' },
-      include: { category: true },
-    });
-    res.status(200).json(transactions);
-  } catch (error) {
-    res.status(500).json({ error: 'Não foi possível buscar as transações.' });
-  }
-});
-
-// UPDATE: PUT /api/transactions/:id
-transactionRouter.put('/:id', async (req, res) => {
-  try {
+// Rota para ATUALIZAR uma transação
+router.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { type, title, amount, date, categoryId } = req.body;
-    const transaction = await prisma.transaction.findFirst({
-      where: { id: id, userId: req.user.id },
-    });
-    if (!transaction) {
-      return res.status(404).json({ error: 'Transação não encontrada ou você não tem permissão.' });
+    const { title, amount, date, type, categoryId, creditCardId, status } = req.body;
+  
+    try {
+      const updatedTransaction = await prisma.transaction.update({
+        where: { id: id, userId: req.user.id },
+        data: {
+            title,
+            amount: amount != null ? parseFloat(amount) : undefined,
+            date: date ? adjustDateForTimezone(date) : undefined, // <<< CORREÇÃO APLICADA AQUI
+            type,
+            status,
+            categoryId,
+            creditCardId,
+        },
+      });
+      res.json(updatedTransaction);
+    } catch (error) {
+      res.status(404).json({ error: 'Transação não encontrada ou não pertence ao usuário.' });
     }
-    const updatedTransaction = await prisma.transaction.update({
-      where: { id },
-      data: { type, title, amount, date: new Date(date), categoryId },
-    });
-    res.status(200).json(updatedTransaction);
-  } catch (error) {
-    res.status(500).json({ error: 'Não foi possível atualizar a transação.' });
-  }
 });
 
-// DELETE: DELETE /api/transactions/:id
-transactionRouter.delete('/:id', async (req, res) => {
-  try {
+// Rota para DELETAR uma transação
+router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    const transaction = await prisma.transaction.findFirst({
-      where: { id: id, userId: req.user.id },
-    });
-    if (!transaction) {
-      return res.status(404).json({ error: 'Transação não encontrada ou você não tem permissão.' });
+  
+    try {
+      await prisma.transaction.delete({
+        where: { id: id, userId: req.user.id },
+      });
+      res.status(204).send(); // Sem conteúdo
+    } catch (error) {
+      res.status(404).json({ error: 'Transação não encontrada ou não pertence ao usuário.' });
     }
-    await prisma.transaction.delete({ where: { id } });
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error: 'Não foi possível deletar a transação.' });
-  }
 });
 
-export default transactionRouter;
+export default router;
