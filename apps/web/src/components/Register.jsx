@@ -25,7 +25,7 @@ function Register() {
     }
 
     try {
-      await api.post('/register', { name, email, password });
+      await api.post('/auth/register', { name, email, password });
       setSuccess('Cadastro realizado! Redirecionando para o login...');
       setTimeout(() => navigate('/login'), 2000); // Redireciona após 2s
     } catch (err) {

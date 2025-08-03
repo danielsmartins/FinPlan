@@ -1,8 +1,10 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import mainRouter from './routes/main.router.js'; // Importa o roteador principal com o novo nome
+import mainRouter from './routes/main.router.js'; 
 
+dotenv.config();
 const app = express();
 
 // Middlewares globais

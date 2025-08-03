@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-// Importando os novos componentes modulares
+// Importando os componentes modulares
+import CategoryManager from './CategoryManager'; 
 import AddTransactionForm from './AddTransactionForm';
 import DashboardHeader from './DashboardHeader';
 import StatCard from './StatCard';
@@ -12,27 +13,35 @@ import TransactionList from './TransactionList';
 function Dashboard() {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
-  // A função para buscar as transações
+  // A função fetchTransactions, agora busca transações e categorias
   const fetchTransactions = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await api.get('/transactions');
-      setTransactions(response.data);
+      // Usamos Promise.all para buscar tudo em paralelo, é mais eficiente
+      const [transactionsResponse, categoriesResponse] = await Promise.all([
+        api.get('/transactions'),
+        api.get('/categories')
+      ]);
+      setTransactions(transactionsResponse.data);
+      setCategories(categoriesResponse.data);
     } catch (err) {
-      console.error("Erro ao buscar transações:", err);
-      setError("Não foi possível carregar suas transações.");
+      console.error("Erro ao buscar dados do dashboard:", err);
+      setError("Não foi possível carregar os dados.");
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // O useEffect que chama a busca de dados
+  // O useEffect chama a função como antes
   useEffect(() => {
-    setIsLoading(true); 
     fetchTransactions();
   }, [fetchTransactions]);
 
@@ -66,7 +75,8 @@ function Dashboard() {
     });
 
     const dataGrouped = monthlyExpenses.reduce((acc, transaction) => {
-      const category = transaction.category || 'Outros';
+      // Usa o nome da categoria vindo da relação, se não, "Outros"
+      const category = transaction.category?.name || 'Sem Categoria';
       if (!acc[category]) { acc[category] = 0; }
       acc[category] += transaction.amount;
       return acc;
@@ -87,7 +97,12 @@ function Dashboard() {
     }
   };
 
-   const handleTransactionSaved = () => {
+  const handleCategoriesUpdated = () => { 
+    setIsCategoryModalOpen(false);
+    fetchTransactions(); 
+  }
+
+  const handleTransactionSaved = () => {
     setIsAddModalOpen(false);
     setEditingTransaction(null);
     fetchTransactions();
@@ -112,29 +127,23 @@ function Dashboard() {
     return <div className="p-8 text-center text-red-600">{error}</div>;
   }
   
-  // O JSX só é renderizado se não estiver carregando e não houver erros
   return (
     <div className="bg-slate-50 min-h-screen">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         <DashboardHeader
           onNewTransaction={() => setIsAddModalOpen(true)}
           onLogout={handleLogout}
+          onManageCategories={() => setIsCategoryModalOpen(true)}
         />
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           <div className="lg:col-span-2 space-y-8">
-            {/* Grid de Estatísticas */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <StatCard title="Receitas do Mês" amount={monthlyStats.totalIncome} colorClass="text-green-600" />
               <StatCard title="Despesas do Mês" amount={monthlyStats.totalExpense} colorClass="text-red-600" />
               <StatCard title="Saldo do Mês" amount={monthlyStats.balance} colorClass={monthlyStats.balance >= 0 ? 'text-slate-800' : 'text-red-600'} />
             </div>
-            
-            {/* Gráfico de Despesas */}
             <ExpenseChart data={expenseByCategory} totalExpenses={monthlyStats.totalExpense} />
           </div>
-
-          {/* Lista de Transações */}
           <div className="lg:col-span-1">
             <TransactionList
               transactions={transactions}
@@ -145,12 +154,22 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Modal de Adicionar/Editar Transação */}
+      {/* Renderização condicional dos dois modais */}
       {(isAddModalOpen || editingTransaction) && (
         <AddTransactionForm
           onCancel={handleCloseForm}
           onSuccess={handleTransactionSaved}
           transactionToEdit={editingTransaction}
+          categories={categories}
+        />
+      )}
+
+
+      {isCategoryModalOpen && (
+        <CategoryManager
+          categories={categories}
+          onClose={() => setIsCategoryModalOpen(false)}
+          onSuccess={handleCategoriesUpdated}
         />
       )}
     </div>

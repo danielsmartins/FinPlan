@@ -16,7 +16,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await api.post('/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('authToken', response.data.token);
       navigate('/dashboard');
     // eslint-disable-next-line no-unused-vars

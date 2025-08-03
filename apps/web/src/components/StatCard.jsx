@@ -1,6 +1,3 @@
-
-import React from 'react';
-
 function StatCard({ title, amount, colorClass }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
