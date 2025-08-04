@@ -1,11 +1,9 @@
 import axios from 'axios';
-
-// Cria uma instância do axios com a URL base da nossa API
 const api = axios.create({
-  baseURL: 'http://localhost:3333/api', 
+  baseURL: import.meta.env.VITE_API_URL, 
 });
 
-// Interceptor para adicionar o token de autenticação em todas as requisições
+// O interceptor continua o mesmo, adicionando o token de autenticação.
 api.interceptors.request.use(async (config) => {
   // Pegamos o token do localStorage 
   const token = localStorage.getItem('authToken');
