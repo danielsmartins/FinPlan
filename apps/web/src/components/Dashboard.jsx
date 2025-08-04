@@ -9,6 +9,7 @@ import BudgetAnalysis from './BudgetAnalysis';
 import CreditCardBills from './CreditCardBills';
 import TransactionList from './TransactionList';
 import StatCardV2 from './StatCardV2';
+import { BanknotesIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline'; // ÍCONES IMPORTADOS
 
 function Dashboard() {
   // Estados
@@ -21,7 +22,6 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  // O estado do modal de categorias foi removido
 
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
@@ -95,32 +95,55 @@ function Dashboard() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja deletar esta transação?')) {
+    if (window.confirm('Tem a certeza que quer apagar este lançamento?')) {
       try {
         await deleteTransaction(id);
         fetchDashboardData();
       } catch (err) {
-        console.error("Erro ao deletar transação:", err);
-        alert("Não foi possível deletar a transação.");
+        console.error("Erro ao apagar o lançamento:", err);
+        alert("Não foi possível apagar o lançamento.");
       }
     }
   };
 
   const handleCloseForm = () => { setIsAddModalOpen(false); setEditingTransaction(null); };
 
-  if (isLoading) return <div className="flex justify-center items-center h-screen bg-slate-100"><p className="text-gray-500">Carregando dados...</p></div>;
+  if (isLoading) return <div className="flex justify-center items-center h-screen bg-slate-100"><p className="text-gray-500">A carregar dados...</p></div>;
   if (error) return <div className="flex justify-center items-center h-screen bg-slate-100"><p className="p-8 text-center text-red-600">{error}</p></div>;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-screen-2xl mx-auto">
-      <DashboardHeader
-        onNewTransaction={() => setIsAddModalOpen(true)}
-        // onManageCategories foi removido
-      />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <StatCardV2 title="Patrimônio Total" mainValue={dashboardMetrics.totalPatrimony} sub1Title="Investido" sub1Value={dashboardMetrics.totalInvested} sub2Title="Saldo em Conta" sub2Value={dashboardMetrics.accountBalance} />
-          <StatCardV2 title="Receitas do Mês" mainValue={dashboardMetrics.paidMonthlyIncome} mainColor="text-green-600" sub1Title="Previstas" sub1Value={dashboardMetrics.pendingMonthlyIncome} sub2Title="Balanço" sub2Value={dashboardMetrics.paidMonthlyIncome - dashboardMetrics.paidMonthlyExpense} />
-          <StatCardV2 title="Despesas do Mês" mainValue={dashboardMetrics.paidMonthlyExpense} mainColor="text-red-600" sub1Title="Previstas" sub1Value={dashboardMetrics.pendingMonthlyExpense} sub2Title="Orçado" sub2Value={dashboardMetrics.totalMonthlyBudget} />
+      <DashboardHeader onNewTransaction={() => setIsAddModalOpen(true)} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          <StatCardV2 
+            title="Património Total" 
+            mainValue={dashboardMetrics.totalPatrimony} 
+            sub1Title="Investido" 
+            sub1Value={dashboardMetrics.totalInvested} 
+            sub2Title="Saldo em Conta" 
+            sub2Value={dashboardMetrics.accountBalance}
+            icon={BanknotesIcon}
+          />
+          <StatCardV2 
+            title="Receitas do Mês" 
+            mainValue={dashboardMetrics.paidMonthlyIncome} 
+            mainColor="text-green-600" 
+            sub1Title="Previstas" 
+            sub1Value={dashboardMetrics.pendingMonthlyIncome} 
+            sub2Title="Balanço" 
+            sub2Value={dashboardMetrics.paidMonthlyIncome - dashboardMetrics.paidMonthlyExpense}
+            icon={ArrowUpCircleIcon}
+          />
+          <StatCardV2 
+            title="Despesas do Mês" 
+            mainValue={dashboardMetrics.paidMonthlyExpense} 
+            mainColor="text-red-600" 
+            sub1Title="Previstas" 
+            sub1Value={dashboardMetrics.pendingMonthlyExpense} 
+            sub2Title="Orçado" 
+            sub2Value={dashboardMetrics.totalMonthlyBudget}
+            icon={ArrowDownCircleIcon}
+          />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-8">
         <div className="lg:col-span-3 space-y-8">
@@ -135,8 +158,7 @@ function Dashboard() {
           />
         </div>
       </div>
-      {(isAddModalOpen || editingTransaction) && <AddTransactionForm onCancel={handleCloseForm} onSuccess={handleSuccess} transactionToEdit={editingTransaction} categories={categories} />}
-    
+      {isAddModalOpen && <AddTransactionForm onCancel={handleCloseForm} onSuccess={handleSuccess} transactionToEdit={editingTransaction} categories={categories} />}
     </div>
   );
 }

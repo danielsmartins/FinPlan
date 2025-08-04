@@ -1,90 +1,70 @@
 import { Router } from 'express';
 import prisma from '../database/prisma.js';
-import { authMiddleware } from '../middlewares/auth.middleware.js'; // Ajuste o caminho se necessário
 
-const categoryRouter = Router();
+const router = Router();
 
-// Aplica o middleware de autenticação a todas as rotas de categoria
-categoryRouter.use(authMiddleware);
-
-// CREATE: POST /api/categories
-categoryRouter.post('/', async (req, res) => {
-  const { name, icon } = req.body;
-  const userId = req.user.id;
-  if (!name) {
-    return res.status(400).json({ message: 'O nome da categoria é obrigatório.' });
-  }
-  try {
-    const newCategory = await prisma.category.create({
-      data: { name, icon, userId },
-    });
-    res.status(201).json(newCategory);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro interno ao criar categoria.' });
-  }
-});
-
-// READ: GET /api/categories
-categoryRouter.get('/', async (req, res) => {
+// Rota para LER todas as categorias
+router.get('/', async (req, res) => {
   try {
     const categories = await prisma.category.findMany({
       where: { userId: req.user.id },
       orderBy: { name: 'asc' },
     });
-    res.status(200).json(categories);
+    res.json(categories);
   } catch (error) {
-    res.status(500).json({ message: 'Erro interno ao listar categorias.' });
+    res.status(500).json({ error: 'Não foi possível buscar as categorias.' });
   }
 });
 
-// UPDATE: PUT /api/categories/:id
-categoryRouter.put('/:id', async (req, res) => {
+// Rota para CRIAR uma nova categoria (agora com ícone)
+router.post('/', async (req, res) => {
+  const { name, icon } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: 'O nome da categoria é obrigatório.' });
+  }
+
+  try {
+    const newCategory = await prisma.category.create({
+      data: {
+        userId: req.user.id,
+        name,
+        icon, // Salva o novo ícone (emoji)
+      },
+    });
+    res.status(201).json(newCategory);
+  } catch (error) {
+    res.status(500).json({ error: 'Não foi possível criar a categoria.' });
+  }
+});
+
+// Rota para ATUALIZAR uma categoria (para mudar nome ou ícone)
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, icon } = req.body;
+
     try {
-        const { id } = req.params;
-        const { name, icon } = req.body;
-
-        const category = await prisma.category.findFirst({
-            where: { id: id, userId: req.user.id }
-        });
-
-        if (!category) {
-            return res.status(404).json({ message: 'Categoria não encontrada ou você não tem permissão.' });
-        }
-
         const updatedCategory = await prisma.category.update({
-            where: { id },
-            data: { name, icon }
+            where: { id: id, userId: req.user.id },
+            data: { name, icon },
         });
-
-        res.status(200).json(updatedCategory);
+        res.json(updatedCategory);
     } catch (error) {
-        res.status(500).json({ message: 'Erro interno ao atualizar a categoria.' });
+        res.status(404).json({ error: 'Categoria não encontrada.' });
     }
 });
 
-// DELETE: DELETE /api/categories/:id
-categoryRouter.delete('/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
 
-        const category = await prisma.category.findFirst({
-            where: { id: id, userId: req.user.id }
-        });
-
-        if (!category) {
-            return res.status(404).json({ message: 'Categoria não encontrada ou você não tem permissão.' });
-        }
-
-        // O schema vai cuidar para que as transações associadas fiquem com categoryId = null
-        await prisma.category.delete({
-            where: { id }
-        });
-        
-        res.status(204).send();
-    } catch (error) {
-        // Se a categoria ainda estiver em uso e a regra do DB impedir, pode dar erro.
-        res.status(500).json({ message: 'Erro interno ao deletar a categoria.' });
-    }
+// Rota para DELETAR uma categoria
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.category.delete({
+      where: { id: id, userId: req.user.id },
+    });
+    res.status(204).send();
+  } catch (error) {
+    res.status(404).json({ error: 'Categoria não encontrada.' });
+  }
 });
 
-export default categoryRouter;
+export default router;

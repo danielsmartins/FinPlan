@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import TransactionActions from './TransactionActions';
-import { ArrowUpCircleIcon, ArrowDownCircleIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
+import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 function TransactionList({ transactions, onEdit, onDelete }) {
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -22,16 +22,16 @@ function TransactionList({ transactions, onEdit, onDelete }) {
         <ul className="space-y-3">
           {transactions.slice(0, 10).map((t) => (
             <li key={t.id} className="flex items-center p-2 rounded-md transition-colors hover:bg-slate-100">
-              {t.type === 'INCOME' 
-                ? <ArrowUpCircleIcon className="w-8 h-8 mr-3 text-green-500 flex-shrink-0" /> 
-                : <ArrowDownCircleIcon className="w-8 h-8 mr-3 text-red-500 flex-shrink-0" />
-              }
+              <div className="w-8 h-8 mr-3 text-2xl flex-shrink-0 flex items-center justify-center">
+                {t.category?.icon || (t.type === 'INCOME' ? '💰' : '💸')}
+              </div>
               <div className="flex-grow overflow-hidden">
                 <p className="font-semibold text-slate-800 truncate">{t.title}</p>
                 <p className="text-sm text-slate-500">{new Date(t.date).toLocaleDateString('pt-BR')}</p>
               </div>
               <div className="flex items-center gap-2 ml-2">
                 <p className={`font-semibold text-right ${t.type === 'INCOME' ? 'text-green-600' : 'text-red-600'}`}>
+                  {t.type === 'INCOME' ? '+ ' : '- '}
                   {t.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </p>
                 <div className="relative">
@@ -43,6 +43,7 @@ function TransactionList({ transactions, onEdit, onDelete }) {
                       transaction={t}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
+                      onClose={() => setOpenMenuId(null)}
                     />
                   )}
                 </div>

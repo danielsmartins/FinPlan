@@ -1,10 +1,8 @@
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Cores para as fatias do gráfico. Adicione mais se tiver muitas categorias.
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF1943', '#19D4FF'];
 
-// Componente para a barra de progresso (sem alterações)
 function ProgressBar({ percentage }) {
   const width = Math.min(percentage, 100);
   let colorClass = 'bg-blue-500';
@@ -24,7 +22,6 @@ function BudgetAnalysis({ data }) {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  // Prepara os dados para o gráfico de pizza, mostrando apenas categorias com gastos.
   const chartData = data
     .filter(item => item.spent > 0)
     .map(item => ({ name: item.name, value: item.spent }));
@@ -56,10 +53,8 @@ function BudgetAnalysis({ data }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Tabela detalhada de gastos vs. orçamento */}
       <div className="mt-6 flex-grow overflow-y-auto">
         <div className="space-y-4">
-          {/* Cabeçalho da tabela */}
           <div className="grid grid-cols-12 gap-2 text-xs font-bold text-gray-500 px-2">
             <div className="col-span-4">CATEGORIA</div>
             <div className="col-span-3 text-right">ORÇADO</div>
@@ -67,10 +62,12 @@ function BudgetAnalysis({ data }) {
             <div className="col-span-2 text-right">% GASTO</div>
           </div>
           
-          {/* Linhas da tabela */}
           {data.map(item => (
             <div key={item.id} className="grid grid-cols-12 gap-2 items-center text-sm border-t pt-2">
-              <div className="col-span-4 font-medium text-gray-800">{item.name}</div>
+              <div className="col-span-4 font-medium text-gray-800 flex items-center gap-3">
+                <span className="text-xl">{item.icon || '📁'}</span>
+                <span>{item.name}</span>
+              </div>
               <div className="col-span-3 text-right text-gray-600">{formatCurrency(item.budgeted)}</div>
               <div className="col-span-3 text-right text-gray-600">{formatCurrency(item.spent)}</div>
               <div className="col-span-2 text-right font-semibold text-gray-800">{`${Math.round(item.percentage)}%`}</div>

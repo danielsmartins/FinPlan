@@ -10,7 +10,6 @@ export const getCategories = async () => {
   }
 };
 
-
 export const createCategory = async (categoryData) => {
   try {
     const response = await api.post('/categories', categoryData);
@@ -21,6 +20,16 @@ export const createCategory = async (categoryData) => {
   }
 };
 
+// NOVA FUNÇÃO PARA ATUALIZAR
+export const updateCategory = async (id, categoryData) => {
+    try {
+      const response = await api.put(`/categories/${id}`, categoryData);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao atualizar categoria:", error.response?.data || error.message);
+      throw error;
+    }
+};
 
 export const deleteCategory = async (categoryId) => {
   try {
