@@ -9,7 +9,7 @@ const app = express();
 
 // Middlewares globais
 const corsOptions = {
-  origin: 'https://fin-plan-web.vercel.app/' 
+  origin: 'https://fin-plan-web.vercel.app' 
 };
 
 app.use(cors(corsOptions));
