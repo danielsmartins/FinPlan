@@ -5,6 +5,25 @@ import prisma from '../database/prisma.js';
 
 const authRouter = Router();
 
+// Rota: POST /api/auth/check-email
+authRouter.post('/check-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email é obrigatório.' });
+    }
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      return res.status(200).json({ isAvailable: false });
+    }
+    return res.status(200).json({ isAvailable: true });
+  } catch (error) {
+    console.error("Erro ao verificar email:", error);
+    res.status(500).json({ error: 'Ocorreu um erro interno ao verificar o email.' });
+  }
+});
+
+
 // Rota: POST /api/auth/register
 authRouter.post('/register', async (req, res) => {
   try {
@@ -12,13 +31,48 @@ authRouter.post('/register', async (req, res) => {
     if (!name || !email || !password || password.length < 6) {
       return res.status(400).json({ error: 'Dados inválidos. Verifique nome, e-mail e a senha (mínimo 6 caracteres).' });
     }
+
+    // Lista de categorias padrão para novos usuários
+    const defaultCategories = [
+      { name: 'Aluguel', icon: '🏠' },
+      { name: 'Alimentação', icon: '🍔' },
+      { name: 'Compras', icon: '🛍️' },
+      { name: 'Lazer', icon: '🎬' },
+      { name: 'Academia', icon: '💪' },
+      { name: 'Celular', icon: '📱' },
+      { name: 'Transporte', icon: '🚗' },
+    ];
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
+
+    // Usando uma transação para criar usuário e categorias
+    const newUser = await prisma.$transaction(async (tx) => {
+      // Cria o novo usuário
+      const user = await tx.user.create({
+        data: { name, email, password: hashedPassword },
+      });
+
+      //Prepara os dados das categorias padrão, associando ao ID do novo usuário
+      const categoriesData = defaultCategories.map(cat => ({
+        ...cat,
+        userId: user.id,
+      }));
+
+      // Cria todas as categorias de uma vez
+      await tx.category.createMany({
+        data: categoriesData,
+      });
+
+      return user;
     });
-    res.status(201).json({ message: 'Usuário criado com sucesso!', userId: user.id });
+
+    res.status(201).json({ message: 'Usuário criado com sucesso!', userId: newUser.id });
   } catch (error) {
-    res.status(400).json({ error: 'Não foi possível criar o usuário. O e-mail pode já estar em uso.' });
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      return res.status(400).json({ error: 'Este email já está em uso.' });
+    }
+    console.error("Erro no registro:", error);
+    res.status(500).json({ error: 'Não foi possível criar o usuário.' });
   }
 });
 
@@ -31,11 +85,11 @@ authRouter.post('/login', async (req, res) => {
     }
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado.' });
+      return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Senha inválida.' });
+      return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
     const token = jwt.sign(
       { userId: user.id },

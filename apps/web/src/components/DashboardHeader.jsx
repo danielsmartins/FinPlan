@@ -1,5 +1,3 @@
-import React from 'react';
-
 function DashboardHeader({ onNewTransaction }) {
   return (
     <div className="flex justify-between items-center mb-8">

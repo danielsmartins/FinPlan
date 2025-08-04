@@ -1,5 +1,3 @@
-import React from 'react';
-
 function StatCardV2({ title, mainValue, sub1Title, sub1Value, sub2Title, sub2Value, mainColor = 'text-gray-900', icon: Icon }) {
   const formatCurrency = (value) => {
     if (typeof value !== 'number') return 'R$ 0,00';

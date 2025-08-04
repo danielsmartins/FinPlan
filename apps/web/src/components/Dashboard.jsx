@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getDashboardData } from '../services/dashboard.service';
 import { deleteTransaction } from '../services/transaction.service';
 
-// Importando os componentes modulares
+
 import AddTransactionForm from './AddTransactionForm';
 import DashboardHeader from './DashboardHeader';
 import BudgetAnalysis from './BudgetAnalysis';

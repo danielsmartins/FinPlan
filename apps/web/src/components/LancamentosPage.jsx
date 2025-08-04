@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useLancamentos } from '../hooks/useLancamentos'; // Importa o novo hook
+import  { useState } from 'react';
+import { useLancamentos } from '../hooks/useLancamentos'; 
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import AddTransactionForm from './AddTransactionForm';
-import TransactionRow from './TransactionRow'; // Importa o novo componente de linha
+import TransactionRow from './TransactionRow'; 
 import clsx from 'clsx';
 
 function LancamentosPage() {

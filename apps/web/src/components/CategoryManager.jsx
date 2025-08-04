@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { createCategory, deleteCategory } from '../services/category.service'; // ATUALIZADO
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 

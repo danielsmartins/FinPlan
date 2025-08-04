@@ -1,11 +1,14 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react'; 
 import api from '../services/api';
 import clsx from 'clsx';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,8 +21,8 @@ function Login() {
     try {
       const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('authToken', response.data.token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`; // Opcional: configurar token no header do axios
       navigate('/dashboard');
-    // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setError('Falha no login. Verifique suas credenciais.');
     } finally {
@@ -41,14 +44,29 @@ function Login() {
               className="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+          
+          {/* 3. Estrutura atualizada para o campo de senha */}
           <div>
             <label htmlFor="password"  className="text-sm font-medium text-gray-700">Senha</label>
-            <input
-              id="password" type="password" placeholder="••••••••" value={password}
-              onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password"
-              className="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'} // Alterna o tipo do input
+                placeholder="••••••••" value={password}
+                onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password"
+                className="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)} // Ação de clique para alternar
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} 
+              </button>
+            </div>
           </div>
+          
           <button 
             type="submit" disabled={loading}
             className={clsx("w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors",
