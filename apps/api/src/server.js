@@ -8,7 +8,11 @@ dotenv.config();
 const app = express();
 
 // Middlewares globais
-app.use(cors());
+const corsOptions = {
+  origin: 'https://fin-plan-web.vercel.app/' 
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 if (process.env.NODE_ENV !== 'production') {
