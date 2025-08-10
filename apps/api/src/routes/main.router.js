@@ -4,7 +4,8 @@ import categoryRoutes from './category.routes.js';
 import transactionRoutes from './transaction.routes.js';
 import investmentRoutes from './investment.routes.js';
 import budgetRoutes from './budget.routes.js';
-import creditCardRoutes from './credit-card.routes.js'; // IMPORTADO
+import creditCardRoutes from './credit-card.routes.js'; 
+import dashboardRoutes from './dashboard.routes.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 const router = Router();
@@ -17,9 +18,10 @@ router.use(authMiddleware);
 
 // Rotas privadas
 router.use('/categories', categoryRoutes);
+router.use('/dashboard', dashboardRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/investments', investmentRoutes);
 router.use('/budgets', budgetRoutes);
-router.use('/credit-cards', creditCardRoutes); // ADICIONADO
+router.use('/credit-cards', creditCardRoutes); 
 
 export default router;
