@@ -32,6 +32,7 @@ export const updateInvestment = async (id, investmentData) => {
   }
 };
 
+
 export const deleteInvestment = async (id) => {
   try {
     await api.delete(`/investments/${id}`);

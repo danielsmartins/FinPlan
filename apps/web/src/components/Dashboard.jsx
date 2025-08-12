@@ -52,7 +52,7 @@ function Dashboard() {
     
     const paidTransactions = transactions.filter(t => t.status === 'PAID');
     
-    const totalInvested = investments.reduce((sum, inv) => sum + inv.value, 0);
+     const totalInvested = investments.reduce((sum, inv) => sum + (parseFloat(inv.quantity) * parseFloat(inv.currentPrice)), 0);
     const accountBalance = paidTransactions.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0) - paidTransactions.filter(t => t.type === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
     const totalPatrimony = totalInvested + accountBalance;
     const paidMonthlyIncome = paidTransactions.filter(t => t.type === 'INCOME' && new Date(t.date).getMonth() === currentMonth && new Date(t.date).getFullYear() === currentYear).reduce((sum, t) => sum + t.amount, 0);

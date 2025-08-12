@@ -33,8 +33,12 @@ function Navbar() {
                   <NavLink to="/budget" className={navLinkClasses}>
                     Orçamento
                   </NavLink>
-                  <NavLink to="/lancamentos" className={navLinkClasses}> {/* LINK ADICIONADO */}
+                  <NavLink to="/lancamentos" className={navLinkClasses}>
                     Lançamentos
+                  </NavLink>
+                  {/* ✨ NOVO LINK AQUI ✨ */}
+                  <NavLink to="/investments" className={navLinkClasses}>
+                    Investimentos
                   </NavLink>
                 </div>
               </div>

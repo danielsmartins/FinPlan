@@ -17,6 +17,7 @@ router.use('/auth', authRoutes);
 router.use(authMiddleware);
 
 // Rotas privadas
+
 router.use('/categories', categoryRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/transactions', transactionRoutes);
