@@ -3,24 +3,50 @@ import prisma from '../database/prisma.js';
 
 const router = Router();
 
-// Rota para LER os orçamentos de um mês/ano específico
+// Rota para LER os orçamentos 
 router.get('/', async (req, res) => {
   const { month, year } = req.query;
+  const userId = req.user.id;
+
   if (!month || !year) {
     return res.status(400).json({ error: 'Mês e ano são obrigatórios.' });
   }
 
+  const monthInt = parseInt(month);
+  const yearInt = parseInt(year);
+
   try {
-    const budgets = await prisma.budget.findMany({
-      where: {
-        userId: req.user.id,
-        month: parseInt(month),
-        year: parseInt(year),
-      },
-      include: { category: true },
-    });
+   
+    const budgets = await prisma.$queryRaw`
+      WITH RankedBudgets AS (
+        SELECT
+          b.amount,
+          b."categoryId",
+          b.month,
+          b.year,
+          ROW_NUMBER() OVER(
+            PARTITION BY b."categoryId" 
+            ORDER BY b.year DESC, b.month DESC
+          ) as rn
+        FROM "Budget" AS b
+        INNER JOIN "Category" AS c ON b."categoryId" = c.id
+        WHERE 
+          c."userId" = ${userId} AND
+          (b.year < ${yearInt} OR (b.year = ${yearInt} AND b.month <= ${monthInt}))
+      )
+      SELECT
+        rb.amount,
+        rb."categoryId",
+        rb.month,
+        rb.year
+      FROM RankedBudgets AS rb
+      WHERE rb.rn = 1;
+    `;
+    
     res.json(budgets);
+
   } catch (error) {
+    console.error("Erro detalhado ao buscar orçamentos:", error);
     res.status(500).json({ error: 'Não foi possível buscar os orçamentos.' });
   }
 });

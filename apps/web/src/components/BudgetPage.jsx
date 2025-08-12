@@ -4,7 +4,7 @@ import { getCategories, createCategory, deleteCategory } from '../services/categ
 import { getBudgets, upsertBudget } from '../services/budget.service';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
-// Importando os novos componentes
+// Importando os componentes filhos
 import CategoryPanel from './CategoryPanel';
 import BudgetList from './BudgetList';
 
@@ -38,15 +38,28 @@ function BudgetPage() {
   }, [fetchData]);
 
   const mergedBudgetData = useMemo(() => {
+    const currentMonth = selectedDate.getMonth() + 1;
+    const currentYear = selectedDate.getFullYear();
+
     return categories.map(cat => {
       const budget = budgets.find(b => b.categoryId === cat.id);
-      return { ...cat, budgetedAmount: budget ? budget.amount : 0 };
+
+      const isInherited = budget ? (budget.year !== currentYear || budget.month !== currentMonth) : false;
+      const budgetedAmount = budget ? budget.amount : 0;
+
+      return { 
+        ...cat, 
+        budgetedAmount,
+        isInherited 
+      };
     });
-  }, [categories, budgets]);
+  }, [categories, budgets, selectedDate]);
+
 
   useEffect(() => {
     const initialValues = {};
     mergedBudgetData.forEach(item => {
+
       initialValues[item.id] = item.budgetedAmount;
     });
     setLocalBudgetValues(initialValues);
@@ -110,7 +123,7 @@ function BudgetPage() {
 
   const totalBudgeted = useMemo(() => budgets.reduce((sum, b) => sum + b.amount, 0), [budgets]);
 
-  return (
+   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-screen-2xl mx-auto">
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <div className="flex justify-between items-center mb-6">
@@ -131,6 +144,7 @@ function BudgetPage() {
               onAddCategory={handleAddCategory}
               onDeleteCategory={handleDeleteCategory}
             />
+            {/* ✨ MODIFICADO: Passando os novos dados para BudgetList */}
             <BudgetList
               budgetsData={mergedBudgetData}
               localValues={localBudgetValues}
