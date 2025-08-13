@@ -5,6 +5,7 @@ const router = Router();
 
 // Rota para LER todas as categorias
 router.get('/', async (req, res) => {
+  console.log("Usuário autenticado:", req.user);
   try {
     const categories = await prisma.category.findMany({
       where: { userId: req.user.id },
@@ -37,33 +38,42 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Rota para ATUALIZAR uma categoria (para mudar nome ou ícone)
 router.put('/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, icon } = req.body;
+  const { id } = req.params;
+  const { name, icon } = req.body;
 
-    try {
-        const updatedCategory = await prisma.category.update({
-            where: { id: id, userId: req.user.id },
-            data: { name, icon },
-        });
-        res.json(updatedCategory);
-    } catch (error) {
-        res.status(404).json({ error: 'Categoria não encontrada.' });
+  try {
+    const updatedCategory = await prisma.category.updateMany({
+      where: { id, userId: req.user.id },
+      data: { name, icon },
+    });
+
+    if (updatedCategory.count === 0) {
+      return res.status(404).json({ error: 'Categoria não encontrada.' });
     }
+
+    res.json({ message: 'Categoria atualizada com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar categoria.' });
+  }
 });
 
-
-// Rota para DELETAR uma categoria
+// DELETAR categoria (com verificação do usuário)
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
+
   try {
-    await prisma.category.delete({
-      where: { id: id, userId: req.user.id },
+    const deletedCategory = await prisma.category.deleteMany({
+      where: { id, userId: req.user.id },
     });
+
+    if (deletedCategory.count === 0) {
+      return res.status(404).json({ error: 'Categoria não encontrada.' });
+    }
+
     res.status(204).send();
   } catch (error) {
-    res.status(404).json({ error: 'Categoria não encontrada.' });
+    res.status(500).json({ error: 'Erro ao deletar categoria.' });
   }
 });
 

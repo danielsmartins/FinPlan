@@ -23,6 +23,8 @@ function Dashboard() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
 
+  console.log(categories)
+
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
     setError(null);

@@ -10,18 +10,19 @@ dashboardRouter.use(authMiddleware);
 // Rota única para buscar todos os dados do dashboard
 dashboardRouter.get('/', async (req, res) => {
   try {
-    const userId = req.userId; // Obtido do authMiddleware
+    const userId = req.user.id;
 
-    // Usamos Promise.all para buscar todos os dados em paralelo, o que é mais rápido
     const [transactions, categories, investments, budgets, creditCards] = await Promise.all([
-      prisma.transaction.findMany({ where: { userId } }),
+      prisma.transaction.findMany({
+        where: { userId },
+        orderBy: { date: 'desc' } // garantir ordenação
+      }),
       prisma.category.findMany({ where: { userId } }),
       prisma.investment.findMany({ where: { userId } }),
-      prisma.budget.findMany({ where: { userId } }), // Simplificado, pode precisar de filtro de data no futuro
+      prisma.budget.findMany({ where: { userId } }),
       prisma.creditCard.findMany({ where: { userId } })
     ]);
 
-    // Devolvemos tudo num único objeto JSON
     res.json({
       transactions,
       categories,
