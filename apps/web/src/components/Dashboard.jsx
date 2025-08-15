@@ -18,8 +18,7 @@ function Dashboard() {
   const [creditCards, setCreditCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState(null);
+
 
   console.log(categories)
 
@@ -88,11 +87,7 @@ function Dashboard() {
     return { totalPatrimony, totalInvested, accountBalance, paidMonthlyIncome, pendingMonthlyIncome, paidMonthlyExpense, pendingMonthlyExpense, totalMonthlyBudget, budgetAnalysisData, creditCardBills };
   }, [transactions, categories, investments, budgets, creditCards]);
 
-  const handleSuccess = () => {
-    setIsAddModalOpen(false);
-    setEditingTransaction(null);
-    fetchDashboardData();
-  };
+
 
   const handleDelete = async (id) => {
     if (window.confirm('Tem a certeza que quer apagar este lançamento?')) {
@@ -106,14 +101,14 @@ function Dashboard() {
     }
   };
 
-  const handleCloseForm = () => { setIsAddModalOpen(false); setEditingTransaction(null); };
+ 
 
   if (isLoading) return <div className="flex justify-center items-center h-screen bg-slate-100"><p className="text-gray-500">A carregar dados...</p></div>;
   if (error) return <div className="flex justify-center items-center h-screen bg-slate-100"><p className="p-8 text-center text-red-600">{error}</p></div>;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-screen-2xl mx-auto">
-      <DashboardHeader onNewTransaction={() => setIsAddModalOpen(true)} />
+      <DashboardHeader  />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           <StatCardV2 
             title="Património Total" 
@@ -153,7 +148,7 @@ function Dashboard() {
         <div className="lg:col-span-2 space-y-8">
           <TransactionList
             transactions={transactions.slice(0, 10)}
-            onEdit={(t) => { setEditingTransaction(t); setIsAddModalOpen(true); }}
+           
             onDelete={handleDelete}
           />
         </div>

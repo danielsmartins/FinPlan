@@ -1,19 +1,5 @@
-import { useState } from 'react';
-import TransactionActions from './TransactionActions';
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
-function TransactionList({ transactions, onEdit, onDelete }) {
-  const [openMenuId, setOpenMenuId] = useState(null);
-
-  const handleEdit = (transaction) => {
-    onEdit(transaction);
-    setOpenMenuId(null);
-  };
-
-  const handleDelete = (id) => {
-    onDelete(id);
-    setOpenMenuId(null);
-  }
+function TransactionList({ transactions}) {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg h-full">
@@ -34,19 +20,7 @@ function TransactionList({ transactions, onEdit, onDelete }) {
                   {t.type === 'INCOME' ? '+ ' : '- '}
                   {t.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </p>
-                <div className="relative">
-                  <button onClick={() => setOpenMenuId(openMenuId === t.id ? null : t.id)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200">
-                    <EllipsisVerticalIcon className="w-5 h-5" />
-                  </button>
-                  {openMenuId === t.id && (
-                    <TransactionActions
-                      transaction={t}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      onClose={() => setOpenMenuId(null)}
-                    />
-                  )}
-                </div>
+
               </div>
             </li>
           ))}
