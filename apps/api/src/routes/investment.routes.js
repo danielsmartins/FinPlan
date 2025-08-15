@@ -2,11 +2,11 @@
 
 import { Router } from 'express';
 import prisma from '../database/prisma.js';
-import { z } from 'zod'; // Usando Zod para validações seguras
+import { z } from 'zod'; 
 
 const router = Router();
 
-// Schema de validação para garantir que os dados estão corretos
+
 const investmentSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
   ticker: z.string().min(1, "O ticker é obrigatório."),
@@ -16,7 +16,7 @@ const investmentSchema = z.object({
   currentPrice: z.number().min(0, "A cotação atual não pode ser negativa."),
 });
 
-// Rota GET: Listar todos os investimentos do usuário
+
 router.get('/', async (req, res) => {
   try {
     const investments = await prisma.investment.findMany({
@@ -29,7 +29,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Rota POST: Criar um novo ativo de investimento
 router.post('/', async (req, res) => {
   try {
     const data = investmentSchema.parse(req.body);
@@ -48,13 +47,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Rota PUT: Atualizar um investimento existente
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const data = investmentSchema.parse(req.body);
 
-    // Garante que o usuário só pode atualizar o próprio investimento
+
     const investment = await prisma.investment.findFirst({
         where: { id: id, userId: req.user.id }
     });
@@ -77,12 +75,11 @@ router.put('/:id', async (req, res) => {
 });
 
 
-// Rota DELETE: Apagar um ativo de investimento
+
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Garante que o usuário só pode apagar o próprio investimento
         const investment = await prisma.investment.findFirst({
             where: { id: id, userId: req.user.id }
         });

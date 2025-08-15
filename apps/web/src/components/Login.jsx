@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react'; 
 import api from '../services/api';
@@ -21,7 +21,7 @@ function Login() {
     try {
       const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('authToken', response.data.token);
-      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`; // Opcional: configurar token no header do axios
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       navigate('/dashboard');
     } catch (err) {
       setError('Falha no login. Verifique suas credenciais.');
@@ -44,21 +44,20 @@ function Login() {
               className="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          
-          {/* 3. Estrutura atualizada para o campo de senha */}
+
           <div>
             <label htmlFor="password"  className="text-sm font-medium text-gray-700">Senha</label>
             <div className="relative">
               <input
                 id="password"
-                type={showPassword ? 'text' : 'password'} // Alterna o tipo do input
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••" value={password}
                 onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password"
                 className="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)} // Ação de clique para alternar
+                onClick={() => setShowPassword(!showPassword)} 
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
                 aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
               >

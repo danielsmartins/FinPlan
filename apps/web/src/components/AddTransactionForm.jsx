@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { createTransaction, updateTransaction } from '../services/transaction.service';
 import clsx from 'clsx';
 
 function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories }) {
   const isEditMode = Boolean(transactionToEdit);
 
-  // Novos estados para status e recorrência
+
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [type, setType] = useState('EXPENSE');
   const [categoryId, setCategoryId] = useState('');
-  const [status, setStatus] = useState('PAID'); // PAID | PENDING
+  const [status, setStatus] = useState('PAID'); 
   const [isRecurring, setIsRecurring] = useState(false);
-  const [recurrenceType, setRecurrenceType] = useState('MONTHLY'); // MONTHLY | YEARLY
+  const [recurrenceType, setRecurrenceType] = useState('MONTHLY'); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +21,11 @@ function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories
     if (isEditMode) {
       setTitle(transactionToEdit.title);
       setAmount(String(transactionToEdit.amount));
-      setDate(new Date(transactionToEdit.date).toISOString().split('T')[0]);
+      const dateObj = new Date(transactionToEdit.date);
+      const year = dateObj.getUTCFullYear();
+      const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); 
+      const day = String(dateObj.getUTCDate()).padStart(2, '0');
+      setDate(`${year}-${month}-${day}`);
       setType(transactionToEdit.type);
       setCategoryId(transactionToEdit.categoryId || '');
       setStatus(transactionToEdit.status || 'PAID');

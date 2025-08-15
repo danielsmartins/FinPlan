@@ -3,7 +3,7 @@ import prisma from '../database/prisma.js';
 
 const router = Router();
 
-// Rota para LER todos os cartões do usuário
+
 router.get('/', async (req, res) => {
   try {
     const creditCards = await prisma.creditCard.findMany({
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Rota para CRIAR um novo cartão
+
 router.post('/', async (req, res) => {
   const { name, closingDay, dueDay } = req.body;
   if (!name || !closingDay || !dueDay) {
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Rota para ATUALIZAR um cartão de crédito
+
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { name, closingDay, dueDay } = req.body;
@@ -47,7 +47,7 @@ router.put('/:id', async (req, res) => {
     const updatedCard = await prisma.creditCard.update({
       where: {
         id: id,
-        userId: req.user.id, // Garante que o usuário só pode editar o seu próprio cartão
+        userId: req.user.id, 
       },
       data: {
         name,
@@ -57,12 +57,12 @@ router.put('/:id', async (req, res) => {
     });
     res.json(updatedCard);
   } catch (error) {
-    // Prisma lança um erro se o registro não for encontrado para a condição `where`
+    
     res.status(404).json({ error: 'Cartão de crédito não encontrado ou não pertence ao usuário.' });
   }
 });
 
-// Rota para DELETAR um cartão de crédito
+
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -70,10 +70,10 @@ router.delete('/:id', async (req, res) => {
     await prisma.creditCard.delete({
       where: {
         id: id,
-        userId: req.user.id, // Garante que o usuário só pode deletar o seu próprio cartão
+        userId: req.user.id, 
       },
     });
-    res.status(204).send(); // Sucesso, sem conteúdo
+    res.status(204).send(); 
   } catch (error) {
     res.status(404).json({ error: 'Cartão de crédito não encontrado ou não pertence ao usuário.' });
   }

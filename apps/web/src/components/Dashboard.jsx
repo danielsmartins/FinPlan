@@ -2,17 +2,15 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getDashboardData } from '../services/dashboard.service';
 import { deleteTransaction } from '../services/transaction.service';
 
-
 import AddTransactionForm from './AddTransactionForm';
 import DashboardHeader from './DashboardHeader';
 import BudgetAnalysis from './BudgetAnalysis';
-import CreditCardBills from './CreditCardBills';
 import TransactionList from './TransactionList';
 import StatCardV2 from './StatCardV2';
-import { BanknotesIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline'; // ÍCONES IMPORTADOS
+import { BanknotesIcon, ArrowUpCircleIcon, ArrowDownCircleIcon } from '@heroicons/react/24/outline';
 
 function Dashboard() {
-  // Estados
+
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [investments, setInvestments] = useState([]);
@@ -150,7 +148,7 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-8">
         <div className="lg:col-span-3 space-y-8">
           <BudgetAnalysis data={dashboardMetrics.budgetAnalysisData} />
-          <CreditCardBills creditCardBills={dashboardMetrics.creditCardBills} />
+         
         </div>
         <div className="lg:col-span-2 space-y-8">
           <TransactionList

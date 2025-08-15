@@ -1,25 +1,21 @@
-// Em web/src/pages/InvestmentsPage.jsx
 
-import React, { useState, useEffect, useMemo } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { getInvestments, createInvestment, updateInvestment, deleteInvestment } from '../services/investment.service';
 
-// Vamos importar os componentes que criaremos a seguir.
-// Por enquanto, eles podem ser arquivos em branco.
 import InvestmentSummaryCards from '../components/InvestmentSummaryCards';
 import InvestmentTable from '../components/InvestmentTable';
 import InvestmentFormModal from '../components/InvestmentFormModal';
 
 
 function InvestmentsPage() {
-  // --- ESTADO DO COMPONENTE ---
+
   const [investments, setInvestments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Estado para controlar o modal de Adicionar/Editar
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvestment, setSelectedInvestment] = useState(null);
 
-  // --- BUSCA DE DADOS ---
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -27,7 +23,7 @@ function InvestmentsPage() {
       setInvestments(data);
     } catch (error) {
       console.error("Erro ao carregar investimentos:", error);
-      // Aqui você pode adicionar um estado para exibir uma mensagem de erro na tela
+
     } finally {
       setIsLoading(false);
     }
@@ -37,13 +33,13 @@ function InvestmentsPage() {
     fetchData();
   }, []); 
 
-  // --- CÁLCULOS PARA OS CARDS DE RESUMO ---
+
   const summaryData = useMemo(() => {
     if (investments.length === 0) {
       return { totalInvested: 0, currentValue: 0, totalProfit: 0, profitPercentage: 0 };
     }
     
-    // Converte os valores que vêm como string do Prisma para número
+
     const numericInvestments = investments.map(inv => ({
       ...inv,
       quantity: parseFloat(inv.quantity),
@@ -59,7 +55,7 @@ function InvestmentsPage() {
     return { totalInvested, currentValue, totalProfit, profitPercentage };
   }, [investments]);
 
-  // --- FUNÇÕES DE MANIPULAÇÃO (EVENT HANDLERS) ---
+
 
   const handleOpenCreateModal = () => {
     setSelectedInvestment(null);
@@ -79,17 +75,17 @@ function InvestmentsPage() {
   const handleSave = async (formData) => {
     try {
       if (selectedInvestment) {
-        // Atualizar um investimento existente
+
         await updateInvestment(selectedInvestment.id, formData);
       } else {
         // Criar um novo investimento
         await createInvestment(formData);
       }
-      fetchData(); // Recarrega os dados para mostrar a alteração
+      fetchData();
       handleCloseModal();
     } catch (error) {
       console.error("Erro ao salvar investimento:", error);
-      // Mostre um alerta/toast de erro para o usuário
+
     }
   };
   
@@ -97,14 +93,14 @@ function InvestmentsPage() {
       if(window.confirm("Tem certeza que deseja apagar este ativo?")) {
           try {
               await deleteInvestment(id);
-              fetchData(); // Recarrega os dados
+              fetchData(); 
           } catch(error) {
               console.error("Erro ao apagar ativo", error);
           }
       }
   }
 
-  // --- RENDERIZAÇÃO ---
+
   if (isLoading) {
     return <div className="p-8 text-center">Carregando investimentos...</div>;
   }
@@ -121,10 +117,9 @@ function InvestmentsPage() {
         </button>
       </div>
       
-      {/* 1. Renderiza os cards de resumo reais */}
       <InvestmentSummaryCards data={summaryData} />
 
-      {/* 2. Renderiza a tabela real dentro do card principal */}
+
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Meus Ativos</h2>
         <InvestmentTable 
@@ -134,7 +129,7 @@ function InvestmentsPage() {
         />
       </div>
 
-      {/* 3. Renderiza o modal (ele só aparece quando isOpen é true) */}
+
       <InvestmentFormModal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 

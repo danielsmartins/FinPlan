@@ -10,7 +10,7 @@ const adjustDateForTimezone = (dateString) => {
   return new Date(date.getTime() + userTimezoneOffset);
 };
 
-// Rota GET 
+
 router.get('/', async (req, res) => {
     try {
       const transactions = await prisma.transaction.findMany({
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Rota para CRIAR uma nova transação 
+
 router.post('/', async (req, res) => {
   // Adicionados os novos campos
   const { title, amount, date, type, categoryId, creditCardId, status, isRecurring, recurrenceType } = req.body;
@@ -44,8 +44,8 @@ router.post('/', async (req, res) => {
         status,
         categoryId,
         creditCardId,
-        isRecurring: Boolean(isRecurring), // Garante que seja booleano
-        recurrenceType: isRecurring ? recurrenceType : null, // Só salva o tipo se for recorrente
+        isRecurring: Boolean(isRecurring), 
+        recurrenceType: isRecurring ? recurrenceType : null, 
       },
     });
     res.status(201).json(newTransaction);
@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Rota para ATUALIZAR uma transação 
+
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { title, amount, date, type, categoryId, creditCardId, status, isRecurring, recurrenceType } = req.body;
@@ -81,7 +81,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Rota DELETE (sem alterações)
+
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     try {

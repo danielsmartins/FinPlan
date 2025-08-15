@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getCategories, createCategory, deleteCategory } from '../services/category.service';
 import { getBudgets, upsertBudget } from '../services/budget.service';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
-// Importando os componentes filhos
+
 import CategoryPanel from './CategoryPanel';
 import BudgetList from './BudgetList';
 
@@ -144,7 +144,6 @@ function BudgetPage() {
               onAddCategory={handleAddCategory}
               onDeleteCategory={handleDeleteCategory}
             />
-            {/* ✨ MODIFICADO: Passando os novos dados para BudgetList */}
             <BudgetList
               budgetsData={mergedBudgetData}
               localValues={localBudgetValues}

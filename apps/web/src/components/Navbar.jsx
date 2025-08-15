@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ConfirmModal from './ConfirmModal';
 
@@ -36,7 +36,6 @@ function Navbar() {
                   <NavLink to="/lancamentos" className={navLinkClasses}>
                     Lançamentos
                   </NavLink>
-                  {/* ✨ NOVO LINK AQUI ✨ */}
                   <NavLink to="/investments" className={navLinkClasses}>
                     Investimentos
                   </NavLink>

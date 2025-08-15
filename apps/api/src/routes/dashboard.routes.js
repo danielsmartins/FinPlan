@@ -7,7 +7,7 @@ const dashboardRouter = Router();
 // Middleware para garantir que o utilizador está autenticado
 dashboardRouter.use(authMiddleware);
 
-// Rota única para buscar todos os dados do dashboard
+
 dashboardRouter.get('/', async (req, res) => {
   try {
     const userId = req.user.id;
@@ -15,7 +15,7 @@ dashboardRouter.get('/', async (req, res) => {
     const [transactions, categories, investments, budgets, creditCards] = await Promise.all([
       prisma.transaction.findMany({
         where: { userId },
-        orderBy: { date: 'desc' } // garantir ordenação
+        orderBy: { date: 'desc' } 
       }),
       prisma.category.findMany({ where: { userId } }),
       prisma.investment.findMany({ where: { userId } }),

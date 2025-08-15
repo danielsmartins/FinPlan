@@ -9,13 +9,13 @@ const app = express();
 
 // Middlewares globais
 const allowedOrigins = [
-  'https://fin-plan-web.vercel.app', // Sua aplicação em produção
-  'http://localhost:5173'           // Sua aplicação em desenvolvimento
+  'https://fin-plan-web.vercel.app', // produção
+  'http://localhost:5173'           // desenvolvimento
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permite requisições sem 'origin' (ex: Postman, apps mobile) ou se a origem estiver na lista
+    
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -31,12 +31,10 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Rota Raiz da API
-// Todas as rotas definidas no mainRouter serão prefixadas com /api
-// Ex: /api/auth/login, /api/transactions, /api/categories
+
 app.use('/api', mainRouter);
 
-// Iniciar o servidor
+
 const port = process.env.PORT || 3333;
 app.listen(port, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${port}`);

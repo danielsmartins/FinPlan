@@ -1,16 +1,13 @@
-// Em web/src/components/InvestmentTable.jsx
-
-import React from 'react';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-// Função auxiliar para formatar moeda
+
 const formatCurrency = (value) => {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
 
 function InvestmentTable({ investments, onEdit, onDelete }) {
 
-  // Caso não hajam investimentos, exibe uma mensagem amigável
+
   if (investments.length === 0) {
     return (
       <div className="text-center py-10">

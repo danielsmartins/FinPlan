@@ -3,7 +3,7 @@ import prisma from '../database/prisma.js';
 
 const router = Router();
 
-// Rota para LER todas as categorias
+
 router.get('/', async (req, res) => {
   console.log("Usuário autenticado:", req.user);
   try {
@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Rota para CRIAR uma nova categoria (agora com ícone)
+
 router.post('/', async (req, res) => {
   const { name, icon } = req.body;
   if (!name) {
@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
       data: {
         userId: req.user.id,
         name,
-        icon, // Salva o novo ícone (emoji)
+        icon,
       },
     });
     res.status(201).json(newCategory);
@@ -58,7 +58,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETAR categoria (com verificação do usuário)
+
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 

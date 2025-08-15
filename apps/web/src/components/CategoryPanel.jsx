@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { TrashIcon } from '@heroicons/react/24/solid';
 import EmojiPicker from 'emoji-picker-react';
 

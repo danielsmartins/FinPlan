@@ -3,7 +3,7 @@ import prisma from '../database/prisma.js';
 
 const router = Router();
 
-// Rota para LER os orçamentos 
+// Rota GET /api/budgets
 router.get('/', async (req, res) => {
   const { month, year } = req.query;
   const userId = req.user.id;
@@ -51,16 +51,15 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Rota para CRIAR ou ATUALIZAR um orçamento (Upsert)
+// Rota POST /api/budgets
 router.post('/', async (req, res) => {
   const { categoryId, amount, month, year } = req.body;
   
-  // Validação mais robusta no backend
+
   if (!categoryId || !month || !year) {
     return res.status(400).json({ error: 'ID da categoria, mês e ano são obrigatórios.' });
   }
 
-  // Trata o valor do amount: se for nulo ou indefinido, considera como 0.
   const finalAmount = (amount == null || isNaN(parseFloat(amount))) ? 0 : parseFloat(amount);
 
   try {

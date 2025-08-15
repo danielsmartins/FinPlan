@@ -11,7 +11,6 @@ function StatCardV2({ title, mainValue, sub1Title, sub1Value, sub2Title, sub2Val
           <h3 className="font-semibold text-gray-500 text-sm">{title}</h3>
           <p className={`text-2xl font-bold mt-2 ${mainColor}`}>{formatCurrency(mainValue)}</p>
         </div>
-        {/* Renderiza o ícone se ele for passado como prop */}
         {Icon && <Icon className="w-8 h-8 text-gray-300" />}
       </div>
       <div className="mt-4 space-y-2 text-sm">

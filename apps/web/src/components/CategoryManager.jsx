@@ -1,5 +1,5 @@
 import  { useState } from 'react';
-import { createCategory, deleteCategory } from '../services/category.service'; // ATUALIZADO
+import { createCategory, deleteCategory } from '../services/category.service'; 
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 function CategoryManager({ categories, onClose, onSuccess }) {
@@ -16,7 +16,7 @@ function CategoryManager({ categories, onClose, onSuccess }) {
     setLoading(true);
     setError('');
     try {
-      // ATUALIZADO: Usa a função do serviço
+
       await createCategory({ name: newCategoryName });
       setNewCategoryName('');
       onSuccess();
@@ -31,7 +31,6 @@ function CategoryManager({ categories, onClose, onSuccess }) {
   const handleDeleteCategory = async (id) => {
     if (window.confirm('Tem certeza? Deletar uma categoria não afeta transações existentes, elas apenas ficarão "Sem Categoria".')) {
       try {
-        // ATUALIZADO: Usa a função do serviço
         await deleteCategory(id);
         onSuccess(); 
       } catch (err) {

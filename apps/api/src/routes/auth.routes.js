@@ -45,20 +45,19 @@ authRouter.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Usando uma transação para criar usuário e categorias
+
     const newUser = await prisma.$transaction(async (tx) => {
-      // Cria o novo usuário
+
       const user = await tx.user.create({
         data: { name, email, password: hashedPassword },
       });
 
-      //Prepara os dados das categorias padrão, associando ao ID do novo usuário
+    
       const categoriesData = defaultCategories.map(cat => ({
         ...cat,
         userId: user.id,
       }));
 
-      // Cria todas as categorias de uma vez
       await tx.category.createMany({
         data: categoriesData,
       });

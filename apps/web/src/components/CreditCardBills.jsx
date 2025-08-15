@@ -7,7 +7,6 @@ function CreditCardBills({ creditCardBills }) {
 
   const formatDate = (date) => {
     if (!date) return '-';
-    // Adiciona 1 dia para corrigir problemas de fuso horário na exibição
     const adjustedDate = new Date(date);
     adjustedDate.setDate(adjustedDate.getDate() + 1);
     return adjustedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });

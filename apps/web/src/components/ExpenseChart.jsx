@@ -1,4 +1,3 @@
-import React from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import { ChartPieIcon } from '@heroicons/react/24/outline';
 
@@ -47,14 +46,13 @@ function ExpenseChart({ data, totalExpenses }) {
             </p>
           </div>
           <ResponsiveContainer width="100%" height="100%">
-            {/* A MUDANÇA ESTÁ AQUI: adicionando a propriedade 'margin' */}
             <PieChart margin={{ top: 5, right: 5, bottom: 20, left: 5 }}>
               <Pie
                 data={data}
                 dataKey="value"
                 nameKey="name"
                 cx="50%"
-                cy="50%" // Centralizado novamente
+                cy="50%" 
                 innerRadius={80}
                 outerRadius={120}
                 paddingAngle={paddingAngle}
@@ -66,7 +64,7 @@ function ExpenseChart({ data, totalExpenses }) {
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
-              {/* O wrapperStyle não é mais necessário, a margem cuida do espaço */}
+            
               <Legend verticalAlign="bottom" height={36} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>

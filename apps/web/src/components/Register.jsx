@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Check, X, Loader2 } from 'lucide-react';
 import api from '../services/api';
 import clsx from 'clsx';
 
-// Componente para o item da lista de validação
+
 const ValidationRequirement = ({ isValid, text }) => (
   <li className={clsx("flex items-center text-sm", {
     "text-green-600": isValid,
@@ -28,10 +28,9 @@ function Register() {
     hasNumber: false,
   });
 
-  // Novos estados para validação de email
   const [isEmailChecking, setIsEmailChecking] = useState(false);
   const [emailValidation, setEmailValidation] = useState({
-    isValid: null, // null: não verificado, true: válido, false: inválido
+    isValid: null, 
     message: '',
   });
 
@@ -40,7 +39,6 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Efeito para validar a senha
   useEffect(() => {
     setPasswordValidation({
       hasSixChars: password.length >= 6,
@@ -49,7 +47,7 @@ function Register() {
     });
   }, [password]);
 
-  // Efeito para validar o email com debounce
+
   useEffect(() => {
     const handler = setTimeout(async () => {
       if (!email) {
@@ -77,7 +75,7 @@ function Register() {
       } finally {
         setIsEmailChecking(false);
       }
-    }, 500); // Atraso de 500ms
+    }, 500); 
 
     return () => {
       clearTimeout(handler);
@@ -138,7 +136,7 @@ function Register() {
             <input id="email-register" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email"
               className="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
             
-            {/* Mensagem de validação do email */}
+
             <div className="mt-1"> 
               {isEmailChecking && <p className="text-xs text-gray-50a0 flex items-center"><Loader2 size={14} className="animate-spin mr-1" /> Verificando...</p>}
               {emailValidation.message && !isEmailChecking && (

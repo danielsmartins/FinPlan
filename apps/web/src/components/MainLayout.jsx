@@ -1,4 +1,3 @@
-import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 
@@ -7,7 +6,7 @@ function MainLayout() {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <main>
-        {/* O conteúdo da página (Dashboard, BudgetPage) será renderizado aqui */}
+
         <Outlet />
       </main>
     </div>

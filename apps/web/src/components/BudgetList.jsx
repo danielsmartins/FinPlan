@@ -28,7 +28,6 @@ function BudgetList({ budgetsData, localValues, onBudgetChange, onSaveBudget, to
                 value={localValues[item.id] ?? ''}
                 onChange={(e) => onBudgetChange(item.id, e.target.value)}
                 onBlur={() => onSaveBudget(item.id)}
-                // ✨ ÚNICA LINHA MODIFICADA ✨
                 className={`w-32 px-2 py-1 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-1 focus:ring-blue-500 ${item.isInherited ? 'text-gray-400 italic' : 'text-gray-800'}`}
               />
             </div>

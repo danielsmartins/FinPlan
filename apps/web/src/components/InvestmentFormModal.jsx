@@ -1,11 +1,11 @@
 
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 
 const tickerBasedTypes = new Set(['ACAO_BR', 'ACAO_EUA', 'FII', 'BDR', 'ETF']);
 
-// Cria o mapa de legendas amigáveis para a UI
+
 const investmentTypeLabels = {
   RENDA_FIXA: 'Renda Fixa',
   ACAO_BR: 'Ação BR',
@@ -17,10 +17,10 @@ const investmentTypeLabels = {
   OUTRO: 'Outro',
 };
 
-// Gera a lista de tipos disponíveis a partir das chaves do mapa
+
 const investmentTypes = Object.keys(investmentTypeLabels);
 
-// Define o estado inicial do formulário em branco
+
 const initialState = {
   name: '',
   ticker: '',
@@ -33,10 +33,10 @@ const initialState = {
 function InvestmentFormModal({ isOpen, onClose, onSave, investment }) {
   const [formData, setFormData] = useState(initialState);
 
-  // Efeito para preencher o formulário ao editar ou limpar ao criar
+
   useEffect(() => {
     if (investment && isOpen) {
-      // Modo Editar: preenche com dados existentes
+
       setFormData({
         name: investment.name,
         ticker: investment.ticker,
@@ -46,30 +46,25 @@ function InvestmentFormModal({ isOpen, onClose, onSave, investment }) {
         currentPrice: String(investment.currentPrice),
       });
     } else {
-      // Modo Criar: reseta para o estado inicial
       setFormData(initialState);
     }
   }, [investment, isOpen]);
-
-  // 2. LÓGICA INTELIGENTE PARA MANIPULAR MUDANÇAS
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData(prev => {
       const newState = { ...prev, [name]: value };
 
-      // Regra 1: Se o Ticker for alterado para um tipo baseado em ticker...
+      
       if (name === 'ticker' && tickerBasedTypes.has(newState.type)) {
-        newState.name = value.toUpperCase(); // ...o Nome é atualizado automaticamente.
+        newState.name = value.toUpperCase(); 
       }
 
-      // Regra 2: Se o Tipo for alterado...
+      
       if (name === 'type') {
         if (tickerBasedTypes.has(value)) {
-          // ...e o novo tipo for baseado em ticker, o Nome herda o Ticker.
           newState.name = newState.ticker.toUpperCase();
         } else {
-          // ...e não for, o Nome é limpo para o usuário preencher.
           newState.name = '';
         }
       }
@@ -80,10 +75,10 @@ function InvestmentFormModal({ isOpen, onClose, onSave, investment }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Converte os valores para número antes de enviar para a API
+
     const dataToSave = {
       ...formData,
-      name: formData.name.toUpperCase(), // Garante que nome e ticker fiquem consistentes
+      name: formData.name.toUpperCase(), 
       ticker: formData.ticker.toUpperCase(),
       quantity: parseFloat(formData.quantity) || 0,
       averageCost: parseFloat(formData.averageCost) || 0,
@@ -97,7 +92,7 @@ function InvestmentFormModal({ isOpen, onClose, onSave, investment }) {
     return null;
   }
 
-  // 3. RENDERIZAÇÃO DO FORMULÁRIO
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">

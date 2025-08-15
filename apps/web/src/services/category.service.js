@@ -20,7 +20,7 @@ export const createCategory = async (categoryData) => {
   }
 };
 
-// NOVA FUNÇÃO PARA ATUALIZAR
+
 export const updateCategory = async (id, categoryData) => {
     try {
       const response = await api.put(`/categories/${id}`, categoryData);
