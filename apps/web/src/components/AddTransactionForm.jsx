@@ -22,9 +22,9 @@ function AddTransactionForm({ onCancel, onSuccess, transactionToEdit, categories
       setTitle(transactionToEdit.title);
       setAmount(String(transactionToEdit.amount));
       const dateObj = new Date(transactionToEdit.date);
-      const year = dateObj.getUTCFullYear();
-      const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); 
-      const day = String(dateObj.getUTCDate()).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
       setDate(`${year}-${month}-${day}`);
       setType(transactionToEdit.type);
       setCategoryId(transactionToEdit.categoryId || '');
