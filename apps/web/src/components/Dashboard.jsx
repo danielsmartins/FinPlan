@@ -158,7 +158,6 @@ function Dashboard() {
           />
         </div>
       </div>
-      {isAddModalOpen && <AddTransactionForm onCancel={handleCloseForm} onSuccess={handleSuccess} transactionToEdit={editingTransaction} categories={categories} />}
     </div>
   );
 }
