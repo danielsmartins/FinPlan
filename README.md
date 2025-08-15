@@ -100,8 +100,6 @@ A aplicação web está disponível para acesso e teste no seguinte link, com de
 
 -   **Frontend (Web):** [https://fin-plan-web.vercel.app/](https://fin-plan-web.vercel.app/)
 
-> **Nota:** Para que a aplicação funcione corretamente, a API (`/apps/api`) também precisa estar com o deploy realizado (ex: na Render, Railway, etc.). A variável de ambiente `VITE_API_BASE_URL` nas configurações do projeto na Vercel deve estar apontando para a URL pública da API.
-
 ---
 
 ## ⚙️ Pré-requisitos
