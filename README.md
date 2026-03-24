@@ -1,8 +1,6 @@
 # 📊 FINPLAN - Planejador Financeiro
 
-## 🚀 [Acesse a demonstração ao vivo aqui!](https://fin-plan-web.vercel.app/)
-
-![Deploy](https://img.shields.io/badge/deployed%20on-Vercel-black.svg) ![License](https://img.shields.io/badge/license-MIT-blue.svg) ![PNPM](https://img.shields.io/badge/pnpm-10.x-orange.svg) ![React](https://img.shields.io/badge/React-19-blue.svg?logo=react) ![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg?logo=node.js)
+ ![License](https://img.shields.io/badge/license-MIT-blue.svg) ![PNPM](https://img.shields.io/badge/pnpm-10.x-orange.svg) ![React](https://img.shields.io/badge/React-19-blue.svg?logo=react) ![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg?logo=node.js)
 
 FINPLAN é uma aplicação full-stack de planejamento financeiro, desenvolvida utilizando uma arquitetura de monorepo com PNPM Workspaces. O projeto é dividido em uma API robusta (`api`) e uma interface web moderna e interativa (`web`).
 
@@ -14,7 +12,6 @@ FINPLAN é uma aplicação full-stack de planejamento financeiro, desenvolvida u
 - [✨ Features](#-features)
 - [🛠️ Stack de Tecnologias](#️-stack-de-tecnologias)
 - [🔩 Estrutura do Monorepo](#-estrutura-do-monorepo)
-- [🚀 Deploy (Demonstração ao Vivo)](#-deploy-demonstração-ao-vivo)
 - [⚙️ Pré-requisitos](#️-pré-requisitos)
 - [🚀 Instalação e Execução Local](#-instalação-e-execução-local)
 - [📜 Scripts Disponíveis](#-scripts-disponíveis)
@@ -92,14 +89,6 @@ O objetivo do FINPLAN é ajudar os usuarios a controlar suas finanças, seus gas
 ├── pnpm-lock.yaml
 └── pnpm-workspace.yaml
 ```
----
-
-## 🚀 Deploy (Demonstração ao Vivo)
-
-A aplicação web está disponível para acesso e teste no seguinte link, com deploy feito na **Vercel**:
-
--   **Frontend (Web):** [https://fin-plan-web.vercel.app/](https://fin-plan-web.vercel.app/)
-
 ---
 
 ## ⚙️ Pré-requisitos
